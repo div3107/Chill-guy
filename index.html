@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chill Guy Aura Calculator</title>
+    <style>
+        /* General Styles */
+        :root {
+            --bg-color: #11112a;
+            --text-color: #f4f3f2;
+            --primary-color: #ff6f61;
+            --secondary-color: #4caf50;
+            --content-bg: rgba(255, 255, 255, 0.1);
+            --input-bg: rgba(0, 0, 0, 0.2);
+            --input-border: #ccc;
+            --box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            --header: #c9ada7;
+            --background: #11112a;
+            --page-color-transition: background .2s ease, color .2s ease;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f4f3f2;
+            --text-color: #11112a;
+            --primary-color: #FFD700;
+            --secondary-color: #4caf50;
+            --content-bg: rgba(0, 0, 0, 0.7);
+            --input-bg: rgba(255, 255, 255, 0.1);
+            --input-border: #444;
+            --box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            --header: #4a4e69;
+            --background: #f4f3f2;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: var(--background);
+            color: var(--text-color);
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            transition: var(--page-color-transition);
+        }
+
+        h1 {
+            margin-top: 20px;
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .content {
+            margin: 20px auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 600px;
+            background: var(--content-bg);
+            border-radius: 15px;
+            box-shadow: var(--box-shadow);
+            backdrop-filter: blur(10px);
+            transition: var(--page-color-transition);
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 5px;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            text-align: left;
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid var(--input-border);
+            background: var(--input-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: border-color 0.3s ease, background 0.3s ease;
+            text-align: left;
+        }
+
+        input[type="text"]:focus, select:focus {
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+        }
+
+        /* Ensure dropdown options are visible in both themes */
+        select option {
+            background: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        [data-theme="light"] select option {
+            background: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 1rem;
+            color: white;
+            background-color: var(--secondary-color);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            animation: fadeIn 0.5s ease;
+            text-align: left;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .aura-meter {
+            margin-top: 20px;
+            width: 100%;
+            height: 20px;
+            background: #444;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .aura-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), #FFA500);
+            width: 0;
+            border-radius: 10px;
+            transition: width 0.5s ease-in-out;
+        }
+
+        footer {
+            margin-top: 20px;
+            padding: 15px;
+            background: var(--content-bg);
+            color: var(--text-color);
+            text-align: center;
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .github-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .github-icon {
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
+            transition: transform 0.3s ease;
+        }
+
+        .github-link:hover .github-icon {
+            transform: rotate(360deg);
+        }
+
+        /* Dark Mode Toggle Button */
+        #darkmode {
+            padding: 0.3em 0.5em;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: scale(1.5);
+            z-index: 1000;
+        }
+
+        .darkmode_icon {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 10px;
+            background: var(--header);
+            transform-origin: center center;
+            transition: transform 0.75s ease-in-out, var(--page-color-transition);
+        }
+
+        .darkmode_icon::after {
+            position: absolute;
+            content: '';
+            width: 16px;
+            height: 16px;
+            left: 8px;
+            bottom: 4px;
+            border-radius: 10px;
+            background: var(--background);
+            transform-origin: center center;
+            transition: transform 0.5s ease, left 0.25s ease, bottom 0.25s ease, var(--page-color-transition);
+        }
+
+        .darkmode_icon .ray {
+            position: absolute;
+            left: 7px;
+            top: 7px;
+            width: 6px;
+            height: 6px;
+            border-radius: 6px;
+            background: var(--header);
+            transform-origin: center;
+            transition: transform 0.5s ease-in-out, var(--page-color-transition);
+        }
+
+        .ray:nth-child(1) {
+            transform: rotate(45deg) translateX(0);
+        }
+        .ray:nth-child(2) {
+            transform: rotate(90deg) translateX(0);
+        }
+        .ray:nth-child(3) {
+            transform: rotate(135deg) translateX(0);
+        }
+        .ray:nth-child(4) {
+            transform: rotate(180deg) translateX(0);
+        }
+        .ray:nth-child(5) {
+            transform: rotate(225deg) translateX(0);
+        }
+        .ray:nth-child(6) {
+            transform: rotate(270deg) translateX(0);
+        }
+        .ray:nth-child(7) {
+            transform: rotate(315deg) translateX(0);
+        }
+        .ray:nth-child(8) {
+            transform: rotate(360deg) translateX(0);
+        }
+
+        [data-theme="light"] .darkmode_icon {
+            transform: scale(0.6);
+        }
+        [data-theme="light"] .darkmode_icon::after {
+            left: 15px;
+            bottom: 8px;
+            transform: scale(0);
+        }
+        [data-theme="light"] .ray:nth-child(1) {
+            transform: rotate(45deg) translateX(-16px);
+        }
+        [data-theme="light"] .ray:nth-child(2) {
+            transform: rotate(90deg) translateX(-16px);
+        }
+        [data-theme="light"] .ray:nth-child(3) {
+            transform: rotate(135deg) translateX(-16px);
+        }
+        [data-theme="light"] .ray:nth-child(4) {
+            transform: rotate(180deg) translateX(-16px);
+        }
+        [data-theme="light"] .ray:nth-child(5) {
+            transform: rotate(225deg) translateX(-16px);
+        }
+        [data-theme="light"] .ray:nth-child(6) {
+            transform: rotate(270deg) translateX(-16px);
+        }
+        [data-theme="light"] .ray:nth-child(7) {
+            transform: rotate(315deg) translateX(-16px);
+        }
+        [data-theme="light"] .ray:nth-child(8) {
+            transform: rotate(360deg) translateX(-16px);
+        }
+    </style>
+    <!-- Include canvas-confetti library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body data-theme="dark">
+    <!-- Hidden Flag in Comment -->
+    <!-- flag{Y0r'er_C3rtifi3d_Chill_Guy} -->
+
+    <audio id="bgm">
+        <source src="https://github.com/div3107/Chill-guy/raw/refs/heads/main/just-a-chill-guy-made-with-Voicemod.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <!-- Fun Activity: Commented YouTube URL -->
+    <!-- <audio id="bgm">
+        <source src="https://www.youtube.com/watch?v=dQw4w9WgXcQ" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio> -->
+
+
+    <!-- Dark Mode Toggle Button -->
+    <span id="darkmode" role="button" tabIndex="0" onClick="changeMode()" onKeyDown="changeMode()">
+        <div class="darkmode_icon">
+            <span class="ray"></span>
+            <span class="ray"></span>
+            <span class="ray"></span>
+            <span class="ray"></span>
+            <span class="ray"></span>
+            <span class="ray"></span>
+            <span class="ray"></span>
+            <span class="ray"></span>
+        </div>
+    </span>
+
+    <h1>Chill Guy Aura Calculator</h1>
+    <div class="content">
+        <img src="https://s3.amazonaws.com/thumbnails.thecrimson.com/photos/2024/12/09/002130_1375466.png.1500x843_q95_crop-smart_upscale.png" alt="Chill Guy Picture">
+
+        <p>Answer a few questions to find out if you're a Chill Guy, Normal Guy, or Kid!</p>
+
+        <label for="age">What's your age?</label>
+        <input type="text" id="age" placeholder="Enter your age" style="width: calc(100% - 24px); padding: 12px; margin: 10px 0;">
+
+        <label for="weekend">How do you usually spend your weekend?</label>
+        <select id="weekend">
+            <option value="">-- Select an option --</option>
+            <option value="working">Working or studying</option>
+            <option value="relaxing">Relaxing at home with some music</option>
+            <option value="partying">Partying and socializing</option>
+        </select>
+
+        <label for="badNews">How do you handle unexpected bad news?</label>
+        <select id="badNews">
+            <option value="">-- Select an option --</option>
+            <option value="panic">Panic and overthink</option>
+            <option value="calm">Stay calm and look for solutions</option>
+            <option value="ignore">Ignore it and hope it goes away</option>
+        </select>
+
+        <label for="vacation">What's your favorite type of vacation?</label>
+        <select id="vacation">
+            <option value="">-- Select an option --</option>
+            <option value="city">Exploring a city with a packed itinerary</option>
+            <option value="beach">Relaxing on a beach with no schedule</option>
+            <option value="adventure">Adventure sports or hiking</option>
+        </select>
+
+        <label for="traffic">How do you react when someone cuts you off in traffic?</label>
+        <select id="traffic">
+            <option value="">-- Select an option --</option>
+            <option value="angry">Get angry and honk loudly</option>
+            <option value="shrug">Shrug it off, no big deal</option>
+            <option value="beat">Try to beat them in the next lane</option>
+        </select>
+
+        <label for="snack">You find out your favorite snack is sold out at the store. What do you do?</label>
+        <select id="snack">
+            <option value="">-- Select an option --</option>
+            <option value="complain">Complain to the store manager</option>
+            <option value="choose">Choose another snack and move on</option>
+            <option value="upset">Feel upset but let it go</option>
+        </select>
+
+        <label for="music">What’s your go-to music genre?</label>
+        <select id="music">
+            <option value="">-- Select an option --</option>
+            <option value="rock">Heavy metal or rock</option>
+            <option value="chill">Chill vibes, like lo-fi or jazz</option>
+            <option value="pop">Pop or dance music</option>
+        </select>
+
+        <label for="tv">What kind of TV shows or movies do you prefer?</label>
+        <select id="tv">
+            <option value="">-- Select an option --</option>
+            <option value="drama">Intense dramas or horror movies</option>
+            <option value="comedy">Relaxing comedies or slice-of-life shows</option>
+            <option value="thriller">Thrillers or action-packed movies</option>
+        </select>
+
+        <label for="project">You’re in a group project, and someone makes a mistake. What do you do?</label>
+        <select id="project">
+            <option value="">-- Select an option --</option>
+            <option value="frustrated">Get frustrated and let everyone know</option>
+            <option value="help">Calmly help them fix it</option>
+            <option value="moveon">Point it out but move on quickly</option>
+        </select>
+
+        <label for="day">If you had a free day to do anything, what would you choose?</label>
+        <select id="day">
+            <option value="">-- Select an option --</option>
+            <option value="productive">Pack your day with productive activities</option>
+            <option value="chill">Chill at home with a good book or music</option>
+            <option value="new">Go out and try something new</option>
+        </select>
+
+        <label for="line">You’re stuck in a long line. What do you do?</label>
+        <select id="line">
+            <option value="">-- Select an option --</option>
+            <option value="complain">Complain about how long it’s taking</option>
+            <option value="phone">Take out your phone and chill</option>
+            <option value="fidget">Start fidgeting and looking for ways to move faster</option>
+        </select>
+
+        <button onclick="calculateResult()">Calculate</button>
+        <button onclick="resetForm()">Reset</button>
+
+        <p id="result" class="hidden"></p>
+
+        <div class="aura-meter hidden" id="auraMeter">
+            <div class="aura-fill" id="auraFill"></div>
+        </div>
+    </div>
+
+    <footer>
+        Designed by a Chill guy | 
+        <a href="https://github.com/div3107" class="github-link" target="_blank">
+            <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Icon" class="github-icon">
+        </a>
+    </footer>
+
+    <script>
+        // Theme Toggle
+        const body = document.querySelector("body");
+
+        function changeMode() {
+            if (body.dataset.theme === "light") {
+                body.dataset.theme = "dark";
+            } else {
+                body.dataset.theme = "light";
+            }
+        }
+
+        // Calculate Result
+        function calculateResult() {
+            const age = parseInt(document.getElementById('age').value, 10);
+            const weekend = document.getElementById('weekend').value;
+            const badNews = document.getElementById('badNews').value;
+            const vacation = document.getElementById('vacation').value;
+            const traffic = document.getElementById('traffic').value;
+            const snack = document.getElementById('snack').value;
+            const music = document.getElementById('music').value;
+            const tv = document.getElementById('tv').value;
+            const project = document.getElementById('project').value;
+            const day = document.getElementById('day').value;
+            const line = document.getElementById('line').value;
+
+            const result = document.getElementById('result');
+            const auraMeter = document.getElementById('auraMeter');
+            const auraFill = document.getElementById('auraFill');
+            const bgm = document.getElementById('bgm');
+
+            if (!age || !weekend || !badNews || !vacation || !traffic || !snack || !music || !tv || !project || !day || !line) {
+                result.textContent = 'Please answer all the questions!';
+                result.classList.remove('hidden');
+                return;
+            }
+
+            let chillScore = 0;
+
+            // Scoring logic
+            if (weekend === 'relaxing') chillScore++;
+            if (badNews === 'calm') chillScore++;
+            if (vacation === 'beach') chillScore++;
+            if (traffic === 'shrug') chillScore++;
+            if (snack === 'choose') chillScore++;
+            if (music === 'chill') chillScore++;
+            if (tv === 'comedy') chillScore++;
+            if (project === 'help') chillScore++;
+            if (day === 'chill') chillScore++;
+            if (line === 'phone') chillScore++;
+
+            const auraPercentage = (chillScore / 10) * 100;
+            auraFill.style.width = `${auraPercentage}%`;
+
+            // Result logic
+            if (age > 18 && chillScore >= 7) {
+                result.textContent = 'Congrats! You are a Chill Guy!';
+                result.classList.remove('hidden');
+                auraMeter.classList.remove('hidden');
+
+                // Play BGM and trigger confetti
+                bgm.play();
+                confetti({
+                    particleCount: 150,
+                    spread: 90,
+                    origin: { y: 0.6 },
+                    colors: ['#FFD700', '#4caf50', '#ff0000']
+                });
+            } else if (age > 12) {
+                result.textContent = 'You are a Normal Guy.';
+                result.classList.remove('hidden');
+                auraMeter.classList.remove('hidden');
+            } else {
+                result.textContent = 'You are a Kid! Keep growing!';
+                result.classList.remove('hidden');
+                auraMeter.classList.remove('hidden');
+            }
+        }
+
+        // Reset Form
+        function resetForm() {
+            document.getElementById('age').value = '';
+            document.getElementById('weekend').value = '';
+            document.getElementById('badNews').value = '';
+            document.getElementById('vacation').value = '';
+            document.getElementById('traffic').value = '';
+            document.getElementById('snack').value = '';
+            document.getElementById('music').value = '';
+            document.getElementById('tv').value = '';
+            document.getElementById('project').value = '';
+            document.getElementById('day').value = '';
+            document.getElementById('line').value = '';
+            document.getElementById('result').textContent = '';
+            document.getElementById('result').classList.add('hidden');
+            document.getElementById('auraMeter').classList.add('hidden');
+            document.getElementById('auraFill').style.width = '0';
+            document.getElementById('bgm').pause();
+            document.getElementById('bgm').currentTime = 0;
+        }
+    </script>
+</body>
+</html>
